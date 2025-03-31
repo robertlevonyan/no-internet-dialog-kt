@@ -27,7 +27,6 @@ kotlin {
             isStatic = true
         }
     }
-    linuxX64()
 
     sourceSets {
         androidMain.dependencies {
