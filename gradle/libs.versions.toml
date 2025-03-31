@@ -1,14 +1,21 @@
 [versions]
-agp = "8.5.2"
-kotlin = "2.1.10"
+agp = "8.9.1"
+kotlin = "2.1.20"
 android-minSdk = "24"
-android-compileSdk = "34"
+android-compileSdk = "35"
 maven = "0.31.0"
+compose-plugin = "1.6.10"
+compose = "1.7.8"
+androidx-activityCompose = "1.10.1"
 
-#[libraries]
-
+[libraries]
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
