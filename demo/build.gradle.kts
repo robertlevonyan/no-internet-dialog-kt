@@ -37,7 +37,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                //put your multiplatform dependencies here
+                implementation(project(":library"))
             }
         }
     }
