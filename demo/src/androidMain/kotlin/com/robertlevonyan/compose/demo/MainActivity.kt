@@ -5,14 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.robertlevonyan.compose.nointernetdialog.NoInternetContent
 import com.robertlevonyan.compose.nointernetdialog.NoInternetDialog
 
@@ -42,6 +42,16 @@ class MainActivity : ComponentActivity() {
 //                    Text("Show dialog")
 //                }
             }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun NoInternetContentPreview() {
+    MaterialTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            NoInternetContent()
         }
     }
 }
