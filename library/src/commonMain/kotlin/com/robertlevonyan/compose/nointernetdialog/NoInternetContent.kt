@@ -1,5 +1,6 @@
 package com.robertlevonyan.compose.nointernetdialog
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -17,7 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -34,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.robertlevonyan.compose.library.generated.resources.Res
 import com.robertlevonyan.compose.library.generated.resources.grave
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -41,6 +45,22 @@ fun NoInternetContent() {
     val imageSize = 150.dp
     val viewportSize = 512f
     val duration = 3000
+
+    val scale = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            scale.animateTo(
+                targetValue = 0.5f,
+                animationSpec = tween(durationMillis = 1000, easing = EaseInOut)
+            )
+            scale.animateTo(
+                targetValue = 2f,
+                animationSpec = tween(durationMillis = 1000, easing = EaseInOut)
+            )
+            delay(5000) // Delay between repeats
+        }
+    }
     val transition = rememberInfiniteTransition()
     val translationY by transition.animateFloat(
         initialValue = 0f,
@@ -49,29 +69,7 @@ fun NoInternetContent() {
             animation = tween(
                 durationMillis = duration,
                 easing = EaseInOut,
-            ),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-    val scaleX by transition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = duration,
-                easing = EaseInOut,
                 delayMillis = 2000,
-            ),
-            repeatMode = RepeatMode.Reverse,
-        )
-    )
-    val scaleY by transition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 2f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = duration,
-                easing = EaseInOut,
             ),
             repeatMode = RepeatMode.Reverse
         )
@@ -87,17 +85,19 @@ fun NoInternetContent() {
         Group(name = "ghost") {
             Group(
                 name = "body",
+                translationY = translationY,
                 pivotY = viewportSize,
-                scaleX = scaleX,
-                scaleY = scaleY,
+                scaleX = scale.value,
+                scaleY = scale.value,
             ) {
                 GhostBody()
             }
             Group(
                 name = "face",
+                translationY = translationY,
                 pivotY = viewportSize,
-                scaleX = scaleX,
-                scaleY = scaleY,
+                scaleX = scale.value,
+                scaleY = scale.value,
             ) {
                 GhostFace()
             }
