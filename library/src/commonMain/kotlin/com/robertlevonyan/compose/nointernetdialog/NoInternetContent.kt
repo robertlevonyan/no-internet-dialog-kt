@@ -3,6 +3,7 @@ package com.robertlevonyan.compose.nointernetdialog
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -42,23 +43,28 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NoInternetContent() {
-    val imageSize = 150.dp
+    val imageSize = 180.dp
     val viewportSize = 512f
     val duration = 3000
 
     val scale = remember { Animatable(0f) }
+    val scaleAnimationSpec: TweenSpec<Float> = tween(
+        durationMillis = 500,
+        easing = EaseInOut,
+        delayMillis = 1000,
+    )
 
     LaunchedEffect(Unit) {
         while (true) {
             scale.animateTo(
                 targetValue = 0.5f,
-                animationSpec = tween(durationMillis = 1000, easing = EaseInOut)
+                animationSpec = scaleAnimationSpec,
             )
             scale.animateTo(
-                targetValue = 2f,
-                animationSpec = tween(durationMillis = 1000, easing = EaseInOut)
+                targetValue = 2.2f,
+                animationSpec = scaleAnimationSpec,
             )
-            delay(5000) // Delay between repeats
+            delay(5000)
         }
     }
     val transition = rememberInfiniteTransition()
@@ -69,9 +75,8 @@ fun NoInternetContent() {
             animation = tween(
                 durationMillis = duration,
                 easing = EaseInOut,
-                delayMillis = 2000,
             ),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         )
     )
     val ghost = rememberVectorPainter(
@@ -123,7 +128,7 @@ fun NoInternetContent() {
                 contentScale = ContentScale.Crop,
             )
             Image(
-                modifier = Modifier.size(250.dp).align(Alignment.Center),
+                modifier = Modifier.size(230.dp).align(Alignment.Center),
                 painter = painterResource(Res.drawable.grave),
                 contentDescription = null,
             )
