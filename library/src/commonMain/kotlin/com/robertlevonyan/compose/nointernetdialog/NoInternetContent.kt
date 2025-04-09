@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,7 +88,6 @@ fun NoInternetContent() {
         viewportHeight = viewportSize,
         autoMirror = true,
     ) { viewPortWidth, viewPortHeight ->
-
         Group(name = "ghost") {
             Group(
                 name = "body",
@@ -108,6 +109,17 @@ fun NoInternetContent() {
             }
         }
     }
+
+    val time by produceState(0f) {
+        while (true) {
+            withInfiniteAnimationFrameMillis {
+                value = it / 1000f
+            }
+        }
+    }
+
+//    val shader = RuntimeShader(WOBBLE_SHADER)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -123,6 +135,22 @@ fun NoInternetContent() {
         Box(modifier = Modifier.size(300.dp)) {
             Image(
                 modifier = Modifier.align(Alignment.TopEnd),
+//                    .onSizeChanged { size ->
+//                        shader.setFloatUniform(
+//                            "resolution",
+//                            size.width.toFloat(),
+//                            size.height.toFloat()
+//                        )
+//                    }
+//                    .graphicsLayer {
+//                        shader.setFloatUniform("time", time)
+//                        renderEffect = RenderEffect
+//                            .createRuntimeShaderEffect(
+//                                shader,
+//                                "contents"
+//                            )
+//                            .asComposeRenderEffect()
+//                    }
                 painter = ghost,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -145,6 +173,20 @@ fun NoInternetContent() {
         }
     }
 }
+
+//@Language("AGSL")
+//private val WOBBLE_SHADER = """
+//    uniform float2 resolution;
+//    uniform float time;
+//    uniform shader contents;
+//    vec4 main(in vec2 fragCoord) {
+//    	vec2 uv = fragCoord.xy / resolution.xy * 0.8 + 0.1;
+//
+//        uv += sin(time * vec2(1.0, 2.0) + uv* 2.0) * 0.01;
+//
+//        return contents.eval(uv * resolution.xy);
+//    }
+//""".trimIndent()
 
 @Composable
 @VectorComposable

@@ -1,14 +1,16 @@
 [versions]
 agp = "8.9.1"
+annotations = "24.0.1"
 kotlin = "2.1.20"
 android-minSdk = "24"
 android-compileSdk = "35"
 maven = "0.31.0"
-compose-plugin = "1.6.10"
+compose-plugin = "1.7.3"
 compose = "1.7.8"
 androidx-activityCompose = "1.10.1"
 
 [libraries]
+annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 
