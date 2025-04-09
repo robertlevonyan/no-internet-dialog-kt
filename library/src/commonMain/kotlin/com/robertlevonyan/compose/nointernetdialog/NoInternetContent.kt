@@ -9,11 +9,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
@@ -53,6 +53,29 @@ fun NoInternetContent() {
             repeatMode = RepeatMode.Reverse
         )
     )
+    val scaleX by transition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = duration,
+                easing = EaseInOut,
+                delayMillis = 2000,
+            ),
+            repeatMode = RepeatMode.Reverse,
+        )
+    )
+    val scaleY by transition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = duration,
+                easing = EaseInOut,
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
     val ghost = rememberVectorPainter(
         defaultWidth = imageSize,
         defaultHeight = imageSize,
@@ -62,10 +85,20 @@ fun NoInternetContent() {
     ) { viewPortWidth, viewPortHeight ->
 
         Group(name = "ghost") {
-            Group(name = "body", translationY = translationY) {
+            Group(
+                name = "body",
+                pivotY = viewportSize,
+                scaleX = scaleX,
+                scaleY = scaleY,
+            ) {
                 GhostBody()
             }
-            Group(name = "face", translationY = translationY) {
+            Group(
+                name = "face",
+                pivotY = viewportSize,
+                scaleX = scaleX,
+                scaleY = scaleY,
+            ) {
                 GhostFace()
             }
         }
@@ -82,31 +115,23 @@ fun NoInternetContent() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier.width(250.dp),
-//            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.size(300.dp)) {
             Image(
-                modifier = Modifier,
+                modifier = Modifier.align(Alignment.TopEnd),
                 painter = ghost,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
-//            Image(
-//                modifier = Modifier,
-//                painter = painterResource(Res.drawable.ghost),
-//                contentDescription = null,
-//                contentScale = ContentScale.Crop,
-//            )
             Image(
-                modifier = Modifier,
+                modifier = Modifier.size(250.dp).align(Alignment.Center),
                 painter = painterResource(Res.drawable.grave),
                 contentDescription = null,
             )
             Image(
                 modifier = Modifier
                     .padding(end = 24.dp, bottom = 12.dp)
-                    .size(40.dp),
+                    .size(40.dp)
+                    .align(Alignment.Center),
                 imageVector = Icons.Rounded.WifiOff,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
