@@ -21,27 +21,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            var showDialog by remember { mutableStateOf(false) }
-
-            if (showDialog) {
-                NoInternetDialog(
-                    onDismissRequest = {
-                        showDialog = false
-                    }
-                )
-            }
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                NoInternetContent()
-//                Button(
-//                    modifier = Modifier.align(Alignment.Center),
-//                    onClick = {
-//                        showDialog = true
-//                    }
-//                ) {
-//                    Text("Show dialog")
-//                }
-            }
+            App()
         }
     }
 }
