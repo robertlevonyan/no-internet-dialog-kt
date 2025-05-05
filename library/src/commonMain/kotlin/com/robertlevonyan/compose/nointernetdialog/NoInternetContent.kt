@@ -118,8 +118,6 @@ fun NoInternetContent() {
         }
     }
 
-//    val shader = RuntimeShader(WOBBLE_SHADER)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
