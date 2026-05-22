@@ -1,4 +1,4 @@
-rootProject.name = "NoInternetDialog"
+rootProject.name = "no-internet-dialog"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

@@ -1,13 +1,11 @@
 package com.robertlevonyan.nointernetdialog
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,10 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -38,72 +34,86 @@ import androidx.compose.ui.graphics.vector.VectorComposable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import nointernetdialog.shared.generated.resources.Res
-import nointernetdialog.shared.generated.resources.grave
+import no_internet_dialog.shared.generated.resources.Res
+import no_internet_dialog.shared.generated.resources.grave
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NoInternetContent() {
     val imageSize = 180.dp
     val viewportSize = 512f
-    val duration = 3000
 
-    val scale = remember { Animatable(0f) }
-    val scaleAnimationSpec: TweenSpec<Float> = tween(
-        durationMillis = 500,
-        easing = EaseInOut,
-        delayMillis = 1000,
-    )
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            scale.animateTo(
-                targetValue = 0.5f,
-                animationSpec = scaleAnimationSpec,
-            )
-            scale.animateTo(
-                targetValue = 2.2f,
-                animationSpec = scaleAnimationSpec,
-            )
-            delay(5000)
-        }
-    }
     val transition = rememberInfiniteTransition()
     val translationY by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = -30f,
+        initialValue = 30f,
+        targetValue = 15f,
         animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = duration,
-                easing = EaseInOut,
-            ),
-            repeatMode = RepeatMode.Reverse,
+            animation = keyframes {
+                durationMillis = 5600
+                30f at 0 using EaseInOut
+                15f at 1600 using EaseInOut
+                15f at 4400
+                30f at 5600 using EaseInOut
+            },
+            repeatMode = RepeatMode.Restart,
         )
     )
+    val scale by transition.animateFloat(
+        initialValue = 1f,
+        targetValue = 2.24f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 5000
+                1f at 0 using EaseInOut
+                2.24f at 1200 using EaseInOut
+                2.24f at 4000
+                1f at 5000 using EaseInOut
+            },
+            repeatMode = RepeatMode.Restart,
+        )
+    )
+    val rotation by transition.animateFloat(
+        initialValue = -1.5f,
+        targetValue = 1.5f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 6000
+                (-1.5f) at 0 using EaseInOut
+                1.5f at 1600 using EaseInOut
+                1.5f at 4600
+                (-1.5f) at 6000 using EaseInOut
+            },
+            repeatMode = RepeatMode.Restart,
+        )
+    )
+    val translationX = 45f
     val ghost = rememberVectorPainter(
         defaultWidth = imageSize,
         defaultHeight = imageSize,
         viewportWidth = viewportSize,
         viewportHeight = viewportSize,
         autoMirror = true,
-    ) { viewPortWidth, viewPortHeight ->
+    ) { _, _ ->
         Group(name = "ghost") {
             Group(
                 name = "body",
+                translationX = translationX,
                 translationY = translationY,
                 pivotY = viewportSize,
-                scaleX = scale.value,
-                scaleY = scale.value,
+                rotation = rotation,
+                scaleX = scale,
+                scaleY = scale,
             ) {
                 GhostBody()
             }
             Group(
                 name = "face",
+                translationX = translationX,
                 translationY = translationY,
                 pivotY = viewportSize,
-                scaleX = scale.value,
-                scaleY = scale.value,
+                rotation = rotation,
+                scaleX = scale,
+                scaleY = scale,
             ) {
                 GhostFace()
             }
@@ -132,23 +142,9 @@ fun NoInternetContent() {
     ) {
         Box(modifier = Modifier.size(300.dp)) {
             Image(
-                modifier = Modifier.align(Alignment.TopEnd),
-//                    .onSizeChanged { size ->
-//                        shader.setFloatUniform(
-//                            "resolution",
-//                            size.width.toFloat(),
-//                            size.height.toFloat()
-//                        )
-//                    }
-//                    .graphicsLayer {
-//                        shader.setFloatUniform("time", time)
-//                        renderEffect = RenderEffect
-//                            .createRuntimeShaderEffect(
-//                                shader,
-//                                "contents"
-//                            )
-//                            .asComposeRenderEffect()
-//                    }
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .rememberWobbleModifier(time),
                 painter = ghost,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -171,20 +167,6 @@ fun NoInternetContent() {
         }
     }
 }
-
-//@Language("AGSL")
-//private val WOBBLE_SHADER = """
-//    uniform float2 resolution;
-//    uniform float time;
-//    uniform shader contents;
-//    vec4 main(in vec2 fragCoord) {
-//    	vec2 uv = fragCoord.xy / resolution.xy * 0.8 + 0.1;
-//
-//        uv += sin(time * vec2(1.0, 2.0) + uv* 2.0) * 0.01;
-//
-//        return contents.eval(uv * resolution.xy);
-//    }
-//""".trimIndent()
 
 @Composable
 @VectorComposable
