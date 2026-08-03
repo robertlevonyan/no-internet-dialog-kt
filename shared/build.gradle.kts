@@ -9,6 +9,8 @@ plugins {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -47,10 +49,19 @@ kotlin {
     }
     
     sourceSets {
+        val skikoMain by creating {
+            dependsOn(commonMain.get())
+        }
+        iosMain.get().dependsOn(skikoMain)
+        jvmMain.get().dependsOn(skikoMain)
+        jsMain.get().dependsOn(skikoMain)
+        wasmJsMain.get().dependsOn(skikoMain)
+
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
         }
         commonMain.dependencies {
+            implementation(libs.jetbrains.annotations)
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)

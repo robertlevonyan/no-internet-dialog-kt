@@ -19,11 +19,12 @@ fun App() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Button(onClick = { showDialog = true }) {
-            Text(text = "Show Dialog")
-        }
-        if (showDialog) {
-            NoInternetDialog { showDialog = false }
-        }
+        NoInternetContent()
+//        Button(onClick = { showDialog = true }) {
+//            Text(text = "Show Dialog")
+//        }
+//        if (showDialog) {
+//            NoInternetDialog { showDialog = false }
+//        }
     }
 }

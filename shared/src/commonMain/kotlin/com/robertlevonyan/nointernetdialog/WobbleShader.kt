@@ -6,6 +6,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Distorts the content with a jelly-like ripple driven by [time] (seconds).
+ * No-op on Android below API 33, where AGSL RenderEffects are unavailable.
+ */
+@Composable
+expect fun Modifier.wobbleRenderEffect(time: Float): Modifier
+
 @Composable
 fun Modifier.rememberWobbleModifier(time: Float): Modifier {
     val wobbleX = sin(time * 2f) * 12f

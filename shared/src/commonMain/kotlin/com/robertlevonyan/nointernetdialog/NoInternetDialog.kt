@@ -11,7 +11,7 @@ import androidx.compose.ui.window.Dialog
 fun NoInternetDialog(
     onDismissRequest: () -> Unit,
 ) {
-    Dialog(onDismissRequest) {
+    Dialog(onDismissRequest = onDismissRequest) {
         Card(modifier = Modifier.fillMaxSize(0.8f)) {
             NoInternetContent()
         }

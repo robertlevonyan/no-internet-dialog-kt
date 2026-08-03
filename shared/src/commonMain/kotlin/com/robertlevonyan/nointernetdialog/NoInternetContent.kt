@@ -1,6 +1,8 @@
 package com.robertlevonyan.nointernetdialog
 
+import androidx.compose.animation.core.EaseInBack
 import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseOutBack
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import no_internet_dialog.shared.generated.resources.Res
+import org.intellij.lang.annotations.Language
 import no_internet_dialog.shared.generated.resources.grave
 import org.jetbrains.compose.resources.painterResource
 
@@ -43,50 +46,75 @@ fun NoInternetContent() {
     val imageSize = 180.dp
     val viewportSize = 512f
 
+    // One synchronized loop mirroring the reference GIF (~4.5s):
+    // hidden behind the grave -> pop up on the right -> hover and drift left
+    // with a pendulum sway -> tuck back behind the stone and sink.
+    val cycleMillis = 4500
     val transition = rememberInfiniteTransition()
     val translationY by transition.animateFloat(
-        initialValue = 30f,
-        targetValue = 15f,
+        initialValue = 120f,
+        targetValue = 120f,
         animationSpec = infiniteRepeatable(
             animation = keyframes {
-                durationMillis = 5600
-                30f at 0 using EaseInOut
-                15f at 1600 using EaseInOut
-                15f at 4400
-                30f at 5600 using EaseInOut
+                durationMillis = cycleMillis
+                120f at 0
+                120f at 500 using EaseOutBack
+                12f at 1200 using EaseInOut
+                18f at 1700 using EaseInOut
+                15f at 3500 using EaseInBack
+                120f at 4100
             },
             repeatMode = RepeatMode.Restart,
         )
     )
     val scale by transition.animateFloat(
-        initialValue = 1f,
-        targetValue = 2.24f,
+        initialValue = 0.9f,
+        targetValue = 0.9f,
         animationSpec = infiniteRepeatable(
             animation = keyframes {
-                durationMillis = 5000
-                1f at 0 using EaseInOut
-                2.24f at 1200 using EaseInOut
-                2.24f at 4000
-                1f at 5000 using EaseInOut
+                durationMillis = cycleMillis
+                0.9f at 0
+                0.9f at 500 using EaseInOut
+                2f at 1200 using EaseInOut
+                2f at 3500 using EaseInOut
+                0.9f at 4100
             },
             repeatMode = RepeatMode.Restart,
         )
     )
     val rotation by transition.animateFloat(
-        initialValue = -1.5f,
-        targetValue = 1.5f,
+        initialValue = 0f,
+        targetValue = 0f,
         animationSpec = infiniteRepeatable(
             animation = keyframes {
-                durationMillis = 6000
-                (-1.5f) at 0 using EaseInOut
-                1.5f at 1600 using EaseInOut
-                1.5f at 4600
-                (-1.5f) at 6000 using EaseInOut
+                durationMillis = cycleMillis
+                0f at 0
+                0f at 500 using EaseInOut
+                8f at 1300 using EaseInOut
+                (-7f) at 2400 using EaseInOut
+                5f at 3200 using EaseInOut
+                0f at 3700
             },
             repeatMode = RepeatMode.Restart,
         )
     )
-    val translationX = 45f
+    val translationX by transition.animateFloat(
+        initialValue = 130f,
+        targetValue = 130f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = cycleMillis
+                130f at 0
+                130f at 1600 using EaseInOut
+                70f at 2600 using EaseInOut
+                70f at 3300 using EaseInOut
+                115f at 3700
+                130f at 4400
+            },
+            repeatMode = RepeatMode.Restart,
+        )
+    )
+    val pivotX = 117f
     val ghost = rememberVectorPainter(
         defaultWidth = imageSize,
         defaultHeight = imageSize,
@@ -99,6 +127,7 @@ fun NoInternetContent() {
                 name = "body",
                 translationX = translationX,
                 translationY = translationY,
+                pivotX = pivotX,
                 pivotY = viewportSize,
                 rotation = rotation,
                 scaleX = scale,
@@ -110,6 +139,7 @@ fun NoInternetContent() {
                 name = "face",
                 translationX = translationX,
                 translationY = translationY,
+                pivotX = pivotX,
                 pivotY = viewportSize,
                 rotation = rotation,
                 scaleX = scale,
@@ -144,7 +174,8 @@ fun NoInternetContent() {
             Image(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .rememberWobbleModifier(time),
+                    .rememberWobbleModifier(time)
+                    .wobbleRenderEffect(time),
                 painter = ghost,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -275,3 +306,17 @@ private fun GhostFace() {
         fill = SolidColor(faceColor),
     )
 }
+
+@Language("AGSL")
+internal val WOBBLE_SHADER = """
+    uniform float2 iResolution;
+    uniform float iTime;
+    uniform shader contents; 
+    vec4 main(in vec2 fragCoord) {
+    	vec2 uv = fragCoord.xy / iResolution.xy * 0.8 + 0.1;
+        
+        uv += sin(iTime * vec2(1.0, 2.0) + uv* 2.0) * 0.01;
+       
+        return contents.eval(uv * iResolution.xy);
+    }
+""".trimIndent()
