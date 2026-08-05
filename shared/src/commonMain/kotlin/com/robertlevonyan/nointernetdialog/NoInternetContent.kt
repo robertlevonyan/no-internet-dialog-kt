@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -41,10 +42,41 @@ import org.intellij.lang.annotations.Language
 import no_internet_dialog.shared.generated.resources.grave
 import org.jetbrains.compose.resources.painterResource
 
+/** The ghost paths are authored against a 512-unit square canvas. */
+private const val CANVAS = 512f
+
+/**
+ * While drifting left the ghost reaches ~30 units past the canvas' left edge,
+ * and a [rememberVectorPainter] clips to its viewport - which sliced the ghost's
+ * left arm off flat mid-drift. Widen the canvas to fit the whole sweep, with
+ * enough surplus that [WOBBLE_SHADER]'s ripple also stays on-canvas.
+ */
+private const val PAD_LEFT = 56f
+private const val CANVAS_WIDTH = CANVAS + PAD_LEFT
+
+/**
+ * The bottom edge is the ground the ghost sinks into, so clipping there is
+ * deliberate - it is what swallows the ghost between cycles, out of sight
+ * behind the mound. The top and right edges already clear the sweep.
+ */
+private const val CANVAS_HEIGHT = CANVAS
+
+/** The ghost sways around a point below its tail, at the canvas' bottom edge. */
+private const val PIVOT_X = 117f
+
+/**
+ * On-screen length of one full 512-unit canvas edge, and where canvas unit
+ * (0, 0) sits inside the stage. [WOBBLE_SHADER] used to magnify the ghost by
+ * 1.25x about its layer's centre; now that it samples 1:1 these hold the ghost
+ * at the size and spot over the grave that it has always been drawn at.
+ */
+private val canvasSize = 180.dp * 1.25f
+private val canvasOriginX = 37.5.dp
+private val canvasOriginY = (-22.5).dp
+
 @Composable
 fun NoInternetContent() {
-    val imageSize = 180.dp
-    val viewportSize = 512f
+    val stageSize = 300.dp
 
     // One synchronized loop mirroring the reference GIF (~4.5s):
     // hidden behind the grave -> pop up on the right -> hover and drift left
@@ -114,39 +146,26 @@ fun NoInternetContent() {
             repeatMode = RepeatMode.Restart,
         )
     )
-    val pivotX = 117f
+    val unit = canvasSize / CANVAS // on-screen length of one canvas unit
     val ghost = rememberVectorPainter(
-        defaultWidth = imageSize,
-        defaultHeight = imageSize,
-        viewportWidth = viewportSize,
-        viewportHeight = viewportSize,
+        defaultWidth = unit * CANVAS_WIDTH,
+        defaultHeight = unit * CANVAS_HEIGHT,
+        viewportWidth = CANVAS_WIDTH,
+        viewportHeight = CANVAS_HEIGHT,
         autoMirror = true,
     ) { _, _ ->
-        Group(name = "ghost") {
-            Group(
-                name = "body",
-                translationX = translationX,
-                translationY = translationY,
-                pivotX = pivotX,
-                pivotY = viewportSize,
-                rotation = rotation,
-                scaleX = scale,
-                scaleY = scale,
-            ) {
-                GhostBody()
-            }
-            Group(
-                name = "face",
-                translationX = translationX,
-                translationY = translationY,
-                pivotX = pivotX,
-                pivotY = viewportSize,
-                rotation = rotation,
-                scaleX = scale,
-                scaleY = scale,
-            ) {
-                GhostFace()
-            }
+        Group(
+            name = "ghost",
+            translationX = translationX + PAD_LEFT,
+            translationY = translationY,
+            pivotX = PIVOT_X,
+            pivotY = CANVAS,
+            rotation = rotation,
+            scaleX = scale,
+            scaleY = scale,
+        ) {
+            GhostBody()
+            GhostFace()
         }
     }
 
@@ -170,10 +189,11 @@ fun NoInternetContent() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(modifier = Modifier.size(300.dp)) {
+        Box(modifier = Modifier.size(stageSize)) {
             Image(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
+                    .align(Alignment.TopStart)
+                    .offset(x = canvasOriginX - unit * PAD_LEFT, y = canvasOriginY)
                     .rememberWobbleModifier(time)
                     .wobbleRenderEffect(time),
                 painter = ghost,
@@ -307,16 +327,23 @@ private fun GhostFace() {
     )
 }
 
+/**
+ * Samples the content 1:1 and offsets it by a small travelling ripple. Sampling
+ * must stay 1:1: scaling `uv` here scales the *output* lookup, which zooms the
+ * content about the layer centre and ties the ghost's on-screen size to the
+ * layer's size. The ripple can reach ~1% outside the layer, which the canvas
+ * padding around the ghost absorbs.
+ */
 @Language("AGSL")
 internal val WOBBLE_SHADER = """
     uniform float2 iResolution;
     uniform float iTime;
-    uniform shader contents; 
+    uniform shader contents;
     vec4 main(in vec2 fragCoord) {
-    	vec2 uv = fragCoord.xy / iResolution.xy * 0.8 + 0.1;
-        
-        uv += sin(iTime * vec2(1.0, 2.0) + uv* 2.0) * 0.01;
-       
+    	vec2 uv = fragCoord.xy / iResolution.xy;
+
+        uv += sin(iTime * vec2(1.0, 2.0) + uv * 2.0) * 0.01;
+
         return contents.eval(uv * iResolution.xy);
     }
 """.trimIndent()
