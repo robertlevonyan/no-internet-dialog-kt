@@ -8,12 +8,12 @@
 [![Compose Multiplatform](https://img.shields.io/badge/Compose%20Multiplatform-1.11.0-4285F4?logo=jetpackcompose&logoColor=white)](https://github.com/JetBrains/compose-multiplatform)
 [![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS%20%7C%20Desktop%20%7C%20Web-5D3FD3)](#-supported-platforms)
 
-<video src="https://github.com/robertlevonyan/no-internet-dialog-kt/raw/main/media/ghost.webm" width="420" autoplay loop muted playsinline controls>
+<video src="https://github.com/robertlevonyan/no-internet-dialog-kt/raw/main/media/ghost.mp4" width="420" autoplay loop muted playsinline controls>
   Your browser can't play embedded video —
-  <a href="./media/ghost.webm">watch <code>media/ghost.webm</code></a> instead.
+  <a href="./media/ghost.mp4">watch <code>media/ghost.mp4</code></a> instead.
 </video>
 
-<sub>▶︎ If the video doesn't play inline, grab it here: <a href="./media/ghost.webm"><code>media/ghost.webm</code></a></sub>
+<sub>▶︎ If the video doesn't play inline, grab it here: <a href="./media/ghost.mp4"><code>media/ghost.mp4</code></a></sub>
 
 </div>
 
@@ -123,7 +123,7 @@ androidApp/                  sample Android app
 desktopApp/                  sample Desktop app
 webApp/                      sample Web app (Wasm + JS)
 iosApp/                      sample iOS app (Xcode project)
-media/ghost.webm             the recording at the top of this file
+media/ghost.mp4             the recording at the top of this file
 ```
 
 ## 🛠 Running the samples
