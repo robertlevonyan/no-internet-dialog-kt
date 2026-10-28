@@ -169,6 +169,8 @@ it settles.
 - Built with [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) and
   [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform).
 
+  Happy Coding!
+
 ## 👤 Author
 
 **Robert Levonyan** — [@robertlevonyan](https://github.com/robertlevonyan)
